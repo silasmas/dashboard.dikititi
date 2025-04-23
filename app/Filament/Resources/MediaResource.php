@@ -1,35 +1,35 @@
 <?php
 namespace App\Filament\Resources;
 
-use Filament\Tables;
-use App\Models\Media;
+use App\Filament\Resources\MediaResource\Pages;
 use App\Models\Category;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Illuminate\Support\Facades\App;
+use App\Models\Media;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Wizard;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Wizard\Step;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Actions\Action as tab;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\TimePicker;
-use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Forms\Components\Wizard\Step;
-use Filament\Tables\Actions\Action as tab;
-use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Actions\Action;
-use App\Filament\Resources\MediaResource\Pages;
+use Filament\Tables\Table;
+use Illuminate\Support\Facades\App;
 
 class MediaResource extends Resource
 {
@@ -122,19 +122,18 @@ class MediaResource extends Resource
                             //     ->preload()
                             //     ->columnSpan(6),
                             Select::make('belongs_to')
-                            ->label('Appartien à :')
-                            ->searchable()
-                            ->preload()
-                            ->columnSpan(6)
-                            ->options(function () {
-                                $locale = app()->getLocale();
+                                ->label('Appartien à :')
+                                ->searchable()
+                                ->preload()
+                                ->columnSpan(6)
+                                ->options(function () {
+                                    $locale = app()->getLocale();
 
-                                return \App\Models\Type::all()
-                                    ->filter(fn ($type) => !empty($type->type_name[$locale])) // ignore les valeurs nulles ou vides
-                                    ->pluck("type_name.$locale", 'id')
-                                    ->toArray();
-                            }),
-
+                                    return \App\Models\Type::all()
+                                        ->filter(fn($type) => ! empty($type->type_name[$locale])) // ignore les valeurs nulles ou vides
+                                        ->pluck("type_name.$locale", 'id')
+                                        ->toArray();
+                                }),
 
                             Select::make('type_id')
                                 ->label('Type :')
@@ -164,34 +163,33 @@ class MediaResource extends Resource
                                 ->columnSpan(6)
                                 ->required(),
 
-                                CheckboxList::make('categories')
-                                    ->label('Choisissez au moins une catégorie')
-                                    ->relationship('categories', 'category_name') // <-- le nom de la relation (pas category_id !)
-                                    ->options(
-                                        \App\Models\Category::all()
-                                            ->mapWithKeys(function ($category) {
-                                                // $locale = App::getLocale();
-                                                // $name = is_array($category->category_name)
-                                                //     ? ($category->category_name[$locale] ?? '[Sans nom]')
-                                                //     : $category->category_name;
+                            CheckboxList::make('categories')
+                                ->label('Choisissez au moins une catégorie')
+                                ->relationship('categories', 'category_name') // <-- le nom de la relation (pas category_id !)
+                                ->options(
+                                    \App\Models\Category::all()
+                                        ->mapWithKeys(function ($category) {
+                                            // $locale = App::getLocale();
+                                            // $name = is_array($category->category_name)
+                                            //     ? ($category->category_name[$locale] ?? '[Sans nom]')
+                                            //     : $category->category_name;
 
-                                                // return [$category->id => $name];
-                                                if (is_null($category)) {
-                                                    return []; // Ou affiche un message par défaut
-                                                }
-                                                return [$category->id => $category->category_name];
-                                            })
-                                            ->toArray()
-                                    )
-                                    ->searchable()
-                                    ->columns([
-                                        'sm' => 2,
-                                        'md' => 3,
-                                        'lg' => 4,
-                                    ])
-                                    ->required()
-                                    ->columnSpanFull()
-
+                                            // return [$category->id => $name];
+                                            if (is_null($category)) {
+                                                return []; // Ou affiche un message par défaut
+                                            }
+                                            return [$category->id => $category->category_name];
+                                        })
+                                        ->toArray()
+                                )
+                                ->searchable()
+                                ->columns([
+                                    'sm' => 2,
+                                    'md' => 3,
+                                    'lg' => 4,
+                                ])
+                                ->required()
+                                ->columnSpanFull()
 
                         ])->columns(12),
                     ]),
@@ -199,23 +197,25 @@ class MediaResource extends Resource
                         Section::make('Upload des couvertures')->schema([
                             FileUpload::make('cover_url')
                                 ->label('Couverture')
-                                ->directory('/storage/images/medias/' . $id . '/cover')
+                                ->directory('images/medias/' . $id . '/cover') // ✅ bon chemin relatif
+                                ->disk('public')                               // ✅ très important
                                 ->imageEditor()
                                 ->imageEditorMode(2)
                                 ->downloadable()
-                                ->visibility('private')
+                                ->visibility('public') // ou 'private' si tu gères l'accès via contrôleur
                                 ->image()
                                 ->maxSize(3024)
                                 ->columnSpan(6)
                                 ->previewable(true),
+
                             FileUpload::make('thumbnail_url')
                                 ->label('Couverture en miniature')
-                                ->directory('/storage/images/medias/' . $id . '/thumbnail')
+                                ->directory('/images/medias/' . $id . '/thumbnail')
                                 ->imageEditor()
-
+                                ->disk('public')
                                 ->imageEditorMode(2)
                                 ->downloadable()
-                                ->visibility('private')
+                                ->visibility('public') // ou 'private' si tu gères l'accès via contrôleur
                                 ->image()
                                 ->maxSize(3024)
                                 ->columnSpan(6)
