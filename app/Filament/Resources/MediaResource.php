@@ -42,7 +42,7 @@ class MediaResource extends Resource
     public static function form(Form $form): Form
     {
         $id = resolveMediaId($form);
-        
+
         return $form
             ->schema([
                 Wizard::make([
