@@ -42,23 +42,7 @@ class MediaResource extends Resource
     public static function form(Form $form): Form
     {
         $id = resolveMediaId($form);
-        // // Récupérer le nom de la route actuelle
-        // $currentRoute = request()->route()->getName();
-
-        // // // Exemple d'utilisation pour vérifier si c'est une route d'édition
-        // if ($currentRoute !== 'filament.admin.resources.media.create') {
-        //     $id = request()->route('record');
-        // } else {
-        //     $lastMedia = Media::latest()->first();
-        //     $id        = $lastMedia ? $lastMedia->id + 1 : 1;
-        // }
-        // // // Récupérer les catégories
-        // $categories = Category::all();
-
-        // // Vérifier si des catégories existent
-        // if ($categories->isEmpty()) {
-        //     dd('Aucune catégorie trouvée.');
-        // }
+        
         return $form
             ->schema([
                 Wizard::make([
@@ -215,29 +199,19 @@ class MediaResource extends Resource
                         Section::make('Upload des couvertures')->schema([
                             FileUpload::make('cover_url')
                                 ->label('Couverture')
-                                ->directory('images/medias/' . $id . '/cover')
+                                ->directory('/storage/images/medias/' . $id . '/cover')
                                 ->imageEditor()
                                 ->imageEditorMode(2)
                                 ->downloadable()
                                 ->visibility('private')
                                 ->image()
-                                // ->getUploadedFileNameForStorageUsing(
-                                //     fn(TemporaryUploadedFile $file): string => Str::uuid() . '.' . $file->getClientOriginalExtension()
-                                // )
                                 ->maxSize(3024)
                                 ->columnSpan(6)
                                 ->previewable(true),
                             FileUpload::make('thumbnail_url')
                                 ->label('Couverture en miniature')
-                                ->directory('images/medias/' . $id . '/thumbnail')
+                                ->directory('/storage/images/medias/' . $id . '/thumbnail')
                                 ->imageEditor()
-                            // ->getUploadedFileNameForStorageUsing(
-                            //     fn(TemporaryUploadedFile $file): string => (string) str($file->getClientOriginalName())
-                            //         ->prepend('custom-prefix-'),
-                            // )
-                                // ->getUploadedFileNameForStorageUsing(
-                                //     fn(TemporaryUploadedFile $file): string => Str::uuid() . '.' . $file->getClientOriginalExtension()
-                                // )
 
                                 ->imageEditorMode(2)
                                 ->downloadable()
