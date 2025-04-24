@@ -122,18 +122,31 @@ class MediaResource extends Resource
                             //     ->preload()
                             //     ->columnSpan(6),
                             Select::make('belongs_to')
-                                ->label('Appartien à :')
-                                ->searchable()
-                                ->preload()
-                                ->columnSpan(6)
-                                ->options(function () {
-                                    $locale = app()->getLocale();
+                            ->label('Appartient à :')
+                            ->searchable()
+                            ->preload()
+                            ->columnSpan(6)
+                            ->options(function () {
+                                $locale = app()->getLocale();
 
-                                    return \App\Models\Type::all()
-                                        ->filter(fn($type) => ! empty($type->type_name[$locale])) // ignore les valeurs nulles ou vides
-                                        ->pluck("type_name.$locale", 'id')
-                                        ->toArray();
-                                }),
+                                // Récupère les ID des types "album" ou "série"
+                                $typeIds = \App\Models\Type::get()
+                                    ->filter(function ($type) use ($locale) {
+                                        $name = $type->type_name;
+                                        // dd($name);
+                                        // return $name;
+                                        return in_array($name, ['Album musique', 'Série TV']);
+                                    })
+                                    ->pluck('id')
+                                    ->toArray();
+                                    // dd($typeIds);
+                                // Récupère les médias dont le type correspond
+                                return \App\Models\Media::whereIn('type_id', $typeIds)
+                                    ->pluck('media_title') // Ou un autre champ représentatif si `title` n'existe pas
+                                    ->toArray();
+                            }),
+
+
 
                             Select::make('type_id')
                                 ->label('Type :')
