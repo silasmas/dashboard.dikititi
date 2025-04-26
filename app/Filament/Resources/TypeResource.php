@@ -45,9 +45,11 @@ class TypeResource extends Resource
                     Textarea::make('type_description')
                         ->maxLength(65535)
                         ->columnSpanFull(),
-                    Select::make('group_id')
-                        ->relationship('group', 'group_name')
+                    Select::make('group.group_name')
+                        // ->relationship('group', 'group_name')
                         ->searchable()
+                        ->label("Groupe")
+                        ->options(\App\Models\Group::all()->pluck('group_name.fr'))
                         ->columnSpanFull()
                         ->preload()
                         ->getOptionLabelUsing(function ($record) {

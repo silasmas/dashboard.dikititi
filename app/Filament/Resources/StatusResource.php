@@ -36,10 +36,9 @@ class StatusResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('group_id')
-                    ->relationship('group', 'group_name')
+                Select::make('group.group_name')
                     ->searchable()
-                    ->options(Group::all()->pluck('group_name', 'id'))
+                ->options(Group::all()->pluck('group_name.fr'))
                     ->preload()
                     ->required()
                     ->columnSpanFull(),
