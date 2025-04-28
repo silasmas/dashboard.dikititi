@@ -13,7 +13,13 @@ class ListDonates extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            // Actions\CreateAction::make(),
+        ];
+    }
+    public function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\DonationResource\Widgets\DonationStats::class,
         ];
     }
 }

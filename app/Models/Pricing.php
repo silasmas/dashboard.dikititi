@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class Pricing extends Model
 {
-    use HasFactory, HasTranslations,Translatable;
+    use HasFactory,Translatable;
 
     /**
      * The attributes that are mass assignable.
