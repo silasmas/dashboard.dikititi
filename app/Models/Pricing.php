@@ -26,7 +26,7 @@ class Pricing extends Model
      * Translatable properties.
      */
     protected $translatable = ['deadline'];
-
+    protected $casts = ["deadline" => 'array'];
     /**
      * MANY-TO-ONE
      * Several orders for a pricing
