@@ -27,7 +27,14 @@ class DonateResource extends Resource
     {
         return 'Gestion des dons';
     }
-
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return "success";
+    }
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
     public static function form(Form $form): Form
     {
         return $form
