@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class Type extends Model
 {
-    use HasFactory,HasTranslations;
+    use HasFactory,Translatable;
 
     /**
      * The attributes that are mass assignable.

@@ -126,11 +126,11 @@ class DonateResource extends Resource
                 // Filtrer par Status de Payment
                 SelectFilter::make('status_id')
                     ->label('Status de don')
+                    ->relationship('payments.status', 'status_name')
                     ->options(function () {
                         return \App\Models\Status::whereHas('payments.donation')
                             ->pluck('status_name', 'id');
                     })
-                    // ->relationship('payments.status', 'status_name')
                     ->searchable()
                     ->preload(),
                 // SelectFilter::make('payment_quick_period')
