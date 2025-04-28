@@ -111,14 +111,14 @@ class DonateResource extends Resource
                         return \App\Models\Type::whereHas('payments.donation')
                             ->pluck('type_name', 'id');
                     })
-                    ->query(function (Builder $query, $state) {
-                        // dd($query->toSql());
-                        if ($state) {
-                            $query->whereHas('payments.type', function ($q) use ($state) {
-                                $q->where('id', $state);
-                            });
-                        }
-                    })
+                    // ->query(function (Builder $query, $state) {
+                    //     // dd($query->toSql());
+                    //     if ($query) {
+                    //         $query->whereHas('payments.type', function ($q) use ($state) {
+                    //             $q->where('id', $state);
+                    //         });
+                    //     }
+                    // })
                     ->searchable()
                     ->preload()
                     ->placeholder('Sélectionner un type'),
