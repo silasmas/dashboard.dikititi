@@ -105,11 +105,23 @@ class DonateResource extends Resource
                     ]),
 
                 // Filtrer par Type de Payment
-                SelectFilter::make('payments.type.type_id')
+                SelectFilter::make('type_id')
                     ->label('Type de don')
-                    ->relationship('payments.type', 'type_name') // 'payment' (relation de Don vers Payment) puis 'type' (relation de Payment vers Type)
+                    ->options(function () {
+                        return \App\Models\Type::whereHas('payments.donation')
+                            ->pluck('type_name', 'id');
+                    })
+                    ->query(function (Builder $query, $state) {
+                        // dd($query->toSql());
+                        if ($state) {
+                            $query->whereHas('payments.type', function ($q) use ($state) {
+                                $q->where('id', $state);
+                            });
+                        }
+                    })
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->placeholder('Sélectionner un type'),
 
                 // Filtrer par Status de Payment
                 SelectFilter::make('payments.status.status_id')
@@ -221,7 +233,7 @@ class DonateResource extends Resource
             ->query(function (Builder $query) {
                 $state = request()->input('tableFilters.payment_quick_period');
                 // dd($query->toSql());
-                if (!$state) {
+                if (! $state) {
                     return;
                 }
 
@@ -236,15 +248,12 @@ class DonateResource extends Resource
                         ]);
                     } elseif ($state === 'month') {
                         $q->whereMonth('created_at', \Carbon\Carbon::now()->month)
-                          ->whereYear('created_at', \Carbon\Carbon::now()->year);
+                            ->whereYear('created_at', \Carbon\Carbon::now()->year);
                     }
                 });
             })
             ->placeholder('Choisir période');
     }
-
-
-
 
     protected static function getTotalAmount(): string
     {
@@ -286,17 +295,15 @@ class DonateResource extends Resource
             ->query(function (Builder $query, array $data) {
                 return $query->when(filled($data['payment_from'] ?? null) || filled($data['payment_until'] ?? null), function (Builder $query) use ($data) {
                     $query->whereHas('payments', function ($q) use ($data) {
-                        if (!empty($data['payment_from'])) {
+                        if (! empty($data['payment_from'])) {
                             $q->whereDate('created_at', '>=', $data['payment_from']);
                         }
-                        if (!empty($data['payment_until'])) {
+                        if (! empty($data['payment_until'])) {
                             $q->whereDate('created_at', '<=', $data['payment_until']);
                         }
                     });
                 });
             });
     }
-
-
 
 }
