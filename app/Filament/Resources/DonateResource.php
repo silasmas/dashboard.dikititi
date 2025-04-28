@@ -96,7 +96,7 @@ class DonateResource extends Resource
             ->filters([
                                                   // self::paymentFilters(),      // Ton filtre Type/Status
                 self::paymentPeriodFilter(),      // Ton filtre Période de Paiement
-                // self::paymentQuickPeriodFilter(), // aujourd'hui, semaine, mois
+                self::paymentQuickPeriodFilter(), // aujourd'hui, semaine, mois
                 SelectFilter::make('currency')
                     ->label('Monnaie')
                     ->options([
@@ -201,48 +201,48 @@ class DonateResource extends Resource
                         return 'Nombre total de dons : ' . \App\Models\Donation::count();
                     })
                     ->disabled() // juste pour afficher
-                    ->color('gray'),
-                Action::make('total_amount')
-                    ->label(fn() => 'Montant total filtré : ' . self::getTotalAmount() . ' $')
-                    ->disabled()
                     ->color('primary'),
+                // Action::make('total_amount')
+                //     ->label(fn() => 'Montant total filtré : ' . self::getTotalAmount() . ' $')
+                //     ->disabled()
+                //     ->color('primary'),
             ]);
 
     }
     protected static function paymentQuickPeriodFilter(): SelectFilter
-{
-    return SelectFilter::make('payment_quick_period')
-        ->label('Période rapide')
-        ->options([
-            'today' => "Aujourd'hui",
-            'week'  => "Cette semaine",
-            'month' => "Ce mois-ci",
-        ])
-        ->query(function (Builder $query, $state) {
-            if (!$state) {
-                return;
-            }
+    {
+        return SelectFilter::make('payment_quick_period')
+            ->label('Période rapide')
+            ->options([
+                'today' => "Aujourd'hui",
+                'week'  => "Cette semaine",
+                'month' => "Ce mois-ci",
+            ])
+            ->query(function (Builder $query) {
+                $state = request()->input('tableFilters.payment_quick_period');
 
-            $query->whereHas('payments', function ($q) use ($state) {
-                if ($state === 'today') {
-                    $q->whereDate('created_at', \Carbon\Carbon::today());
+                if (!$state) {
+                    return;
                 }
 
-                if ($state === 'week') {
-                    $q->whereBetween('created_at', [
-                        \Carbon\Carbon::now()->startOfWeek(),
-                        \Carbon\Carbon::now()->endOfWeek(),
-                    ]);
-                }
+                $query->whereHas('payments', function ($q) use ($state) {
+                    if ($state === 'today') {
+                        $q->whereDate('created_at', \Carbon\Carbon::today());
+                    } elseif ($state === 'week') {
+                        $q->whereBetween('created_at', [
+                            \Carbon\Carbon::now()->startOfWeek(),
+                            \Carbon\Carbon::now()->endOfWeek(),
+                        ]);
+                    } elseif ($state === 'month') {
+                        $q->whereMonth('created_at', \Carbon\Carbon::now()->month)
+                          ->whereYear('created_at', \Carbon\Carbon::now()->year);
+                    }
+                });
+            })
+            ->placeholder('Choisir période');
+    }
 
-                if ($state === 'month') {
-                    $q->whereMonth('created_at', \Carbon\Carbon::now()->month)
-                      ->whereYear('created_at', \Carbon\Carbon::now()->year);
-                }
-            });
-        })
-        ->placeholder('Choisir période');
-}
+
 
 
     protected static function getTotalAmount(): string
@@ -276,28 +276,26 @@ class DonateResource extends Resource
     }
 
     protected static function paymentPeriodFilter(): Filter
-{
-    return Filter::make('payment_period')
-        ->form([
-            DatePicker::make('payment_from')
-                ->label('Date de début'),
-
-            DatePicker::make('payment_until')
-                ->label('Date de fin'),
-        ])
-        ->query(function (Builder $query, array $data) {
-            return $query->when(filled($data['payment_from'] ?? null) || filled($data['payment_until'] ?? null), function (Builder $query) use ($data) {
-                $query->whereHas('payments', function ($q) use ($data) {
-                    if (!empty($data['payment_from'])) {
-                        $q->whereDate('created_at', '>=', $data['payment_from']);
-                    }
-                    if (!empty($data['payment_until'])) {
-                        $q->whereDate('created_at', '<=', $data['payment_until']);
-                    }
+    {
+        return Filter::make('payment_period')
+            ->form([
+                DatePicker::make('payment_from')->label('Date de début'),
+                DatePicker::make('payment_until')->label('Date de fin'),
+            ])
+            ->query(function (Builder $query, array $data) {
+                return $query->when(filled($data['payment_from'] ?? null) || filled($data['payment_until'] ?? null), function (Builder $query) use ($data) {
+                    $query->whereHas('payments', function ($q) use ($data) {
+                        if (!empty($data['payment_from'])) {
+                            $q->whereDate('created_at', '>=', $data['payment_from']);
+                        }
+                        if (!empty($data['payment_until'])) {
+                            $q->whereDate('created_at', '<=', $data['payment_until']);
+                        }
+                    });
                 });
             });
-        });
-}
+    }
+
 
 
 }
