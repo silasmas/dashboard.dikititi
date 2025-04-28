@@ -220,13 +220,14 @@ class DonateResource extends Resource
             ])
             ->query(function (Builder $query) {
                 $state = request()->input('tableFilters.payment_quick_period');
-
+                // dd($query->toSql());
                 if (!$state) {
                     return;
                 }
 
                 $query->whereHas('payments', function ($q) use ($state) {
                     if ($state === 'today') {
+                        dd($q);
                         $q->whereDate('created_at', \Carbon\Carbon::today());
                     } elseif ($state === 'week') {
                         $q->whereBetween('created_at', [
