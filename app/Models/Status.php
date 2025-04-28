@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class Status extends Model
 {
-    use HasFactory, Translatable;
+    use HasFactory, HasTranslations;
 
     /**
      * The attributes that are mass assignable.
