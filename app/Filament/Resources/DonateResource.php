@@ -21,7 +21,12 @@ class DonateResource extends Resource
 {
     protected static ?string $model = Donation::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-gift';
+    protected static ?int $navigationSort = 3;
+    public static function getLabel(): string
+    {
+        return 'Gestion des dons';
+    }
 
     public static function form(Form $form): Form
     {
