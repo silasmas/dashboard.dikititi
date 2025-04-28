@@ -124,7 +124,7 @@ class DonateResource extends Resource
                     ->placeholder('Sélectionner un type'),
 
                 // Filtrer par Status de Payment
-                SelectFilter::make('status_id')
+                SelectFilter::make('payments.status_id')
                     ->label('Status de don')
                     // ->relationship('payments.status', 'status_name')
                     ->options(function () {
