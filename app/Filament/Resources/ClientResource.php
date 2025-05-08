@@ -85,7 +85,12 @@ class ClientResource extends Resource
                                 Select::make('status_id')
                                     ->label('Status')
                                     ->searchable()
-                                    ->options(Status::all()->pluck('status_name.ln', 'id'))
+                                    ->options(
+                                        Status::whereNotNull('status_name')
+                                            ->pluck('status_name', 'id')
+                                            ->toArray()
+                                    )
+
                                     ->preload()
                                     ->columnSpan(6)
                                     ->relationship('status', 'status_name'),
@@ -183,7 +188,7 @@ class ClientResource extends Resource
             ->filters([
                 SelectFilter::make('status_id')
                     ->label('Status')
-                    ->options(Status::all()->pluck('status_name.fr', 'id')->toArray()),
+                    ->options(Status::all()->pluck('status_name', 'id')->toArray()),
                 SelectFilter::make('country')
                     ->label(label: 'Pays')
                     ->relationship('country', 'country_name'),
