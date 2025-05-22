@@ -14,7 +14,8 @@ Route::get('/dashboard', [BaseController::class, 'dashbord'])->middleware(['auth
 //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
-Route::get('/symlink', function () {
+Route::get('/
+', function () {
     return view('symlink');
 })->name('generate_symlink');
 Route::post('/upload-video', function (Request $request) {

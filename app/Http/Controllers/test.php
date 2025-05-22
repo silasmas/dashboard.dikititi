@@ -93,6 +93,7 @@ class Test extends BaseController
 
         // Nettoyage local
         unlink($finalPath);
+\Log::info('Final response data', ['url' => Storage::disk('s3')->url($s3VideoPath)]);
 
         return response()->json([
             'path' => Storage::disk('s3')->url($s3VideoPath),
