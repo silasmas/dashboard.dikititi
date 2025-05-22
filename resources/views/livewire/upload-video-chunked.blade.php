@@ -367,7 +367,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     } catch (e) {
                         console.error('Erreur JSON :', rawText);
-                        Swal.fire('Erreur', 'Échec de la récupération du lien.',
+                        console.error('Erreur e :', e);
+                        Swal.fire('Erreur', 'Échec de la récupération du lien.'+e,
                             'error');
                     }
 
