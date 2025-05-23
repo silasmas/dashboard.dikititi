@@ -196,9 +196,9 @@ class UserResource extends Resource
             ])
             ->filters([
 
-                SelectFilter::make('status_id')
-                    ->label('Status')
-                    ->options(Status::all()->pluck('status_name.fr', 'id')->toArray()),
+                // SelectFilter::make('status_id')
+                //     ->label('Status')
+                //     ->options(Status::all()->pluck('status_name.fr', 'id')->toArray()),
                 SelectFilter::make('country')
                     ->label(label: 'Pays')
                     ->relationship('country', 'country_name'),
