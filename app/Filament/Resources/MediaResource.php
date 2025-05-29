@@ -142,7 +142,7 @@ class MediaResource extends Resource
                                     // dd($typeIds);
                                 // Récupère les médias dont le type correspond
                                 return \App\Models\Media::whereIn('type_id', $typeIds)
-                                    ->pluck('id'.'-'.'media_title') // Ou un autre champ représentatif si `title` n'existe pas
+                                    ->pluck('media_title') // Ou un autre champ représentatif si `title` n'existe pas
                                     ->toArray();
                             }),
 
