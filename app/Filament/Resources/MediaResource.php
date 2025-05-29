@@ -121,51 +121,30 @@ class MediaResource extends Resource
                             //     ->searchable()
                             //     ->preload()
                             //     ->columnSpan(6),
-                            // Select::make('belongs_to')
-                            // ->label('Appartient à :')
-                            // ->searchable()
-                            // ->preload()
-                            // ->columnSpan(6)
-                            // ->options(function () {
-                            //     $locale = app()->getLocale();
-
-                            //     // Récupère les ID des types "album" ou "série"
-                            //     $typeIds = \App\Models\Type::get()
-                            //         ->filter(function ($type) use ($locale) {
-                            //             $name = $type->type_name;
-                            //             // dd($name);
-                            //             // return $name;
-                            //             return in_array($name, ['Album musique', 'Série TV']);
-                            //         })
-                            //         ->pluck('id')
-                            //         ->toArray();
-                            //         // dd($typeIds);
-                            //     // Récupère les médias dont le type correspond
-                            //     return \App\Models\Media::whereIn('type_id', $typeIds)
-                            //         ->pluck('id'.'-'.'media_title') // Ou un autre champ représentatif si `title` n'existe pas
-                            //         ->toArray();
-                            // }),
                             Select::make('belongs_to')
-    ->label('Appartient à :')
-    ->searchable()
-    ->preload()
-    ->columnSpan(6)
-   ->options(function () {
-    $typeIds = \App\Models\Type::whereIn('type_name', ['Album musique', 'Série TV'])
-        ->pluck('id');
+                            ->label('Appartient à :')
+                            ->searchable()
+                            ->preload()
+                            ->columnSpan(6)
+                            ->options(function () {
+                                $locale = app()->getLocale();
 
-    return \App\Models\Media::whereIn('type_id', $typeIds)
-        ->get() // On récupère tous les objets Media
-        ->mapWithKeys(function ($media) {
-            return [
-                $media->id => $media->media_title . ' (' . $media->id . ')'
-                // ou toute autre concaténation comme : "$media->media_title - Type $media->type_id"
-            ];
-        })
-        ->toArray();
-}),
-
-
+                                // Récupère les ID des types "album" ou "série"
+                                $typeIds = \App\Models\Type::get()
+                                    ->filter(function ($type) use ($locale) {
+                                        $name = $type->type_name;
+                                        // dd($name);
+                                        // return $name;
+                                        return in_array($name, ['Album musique', 'Série TV']);
+                                    })
+                                    ->pluck('id')
+                                    ->toArray();
+                                    // dd($typeIds);
+                                // Récupère les médias dont le type correspond
+                                return \App\Models\Media::whereIn('type_id', $typeIds)
+                                    ->pluck('id'.'-'.'media_title') // Ou un autre champ représentatif si `title` n'existe pas
+                                    ->toArray();
+                            }),
 
 
 
