@@ -25,7 +25,7 @@ Route::post('/upload-video', function (Request $request) {
         return response()->json(['path' => $path]);
     }
     return response()->json(['error' => 'Fichier manquant'], 400);
-});
+}); 
 
 
 Route::post('/upload-video-chunk', [Test::class, 'uploadChunk'])->name('video.chunk.upload');

@@ -233,7 +233,7 @@ class MediaResource extends Resource
                                 ->maxSize(3024)
                                 ->columnSpan(6)
                                 ->previewable(true),
-                        ]),
+                        ]), 
                     ]),
                     Step::make('Étape 4')->schema([
                         Section::make('Vidéo')->schema([
