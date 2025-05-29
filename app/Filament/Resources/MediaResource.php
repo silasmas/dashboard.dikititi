@@ -137,6 +137,7 @@ class MediaResource extends Resource
                                         // return $name;
                                         return in_array($name, ['Album musique', 'Série TV']);
                                     })
+                                    ->pluck('id')
                                     ->toArray();
                                     // dd($typeIds);
                                 // Récupère les médias dont le type correspond
