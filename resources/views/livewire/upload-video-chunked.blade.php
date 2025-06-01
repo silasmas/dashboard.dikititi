@@ -1,7 +1,7 @@
 <!-- ✅ ZONE UPLOAD + PREVIEW STYLÉE -->
 <div>
     <label for="video-upload">Uploader une vidéo (.mp4, .mov) :</label>
-    <input type="file" id="video-upload" accept="video/mp4,video/quicktime" class="form-control" />
+    <input type="file" id="video-upload" accept="video/AVI,video/mp4,video/quicktime" class="form-control" />
 
     <!-- 🎟️ Barre de progression chunks -->
     <div id="progress-container" style="margin-top: 10px; border: 1px solid #ccc;">
