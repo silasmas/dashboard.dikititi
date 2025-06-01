@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const finalizingBox = document.getElementById('video-finalizing');
         const estimatedText = document.getElementById('estimated-time');
         const rebuildProgress = document.getElementById('rebuild-bar-fill');
-        const chunkSize = 5 * 1024 * 1024;
+        const chunkSize = 10 * 1024 * 1024;
 
         const displayVideoPreview = (url) => {
             const oldIframe = videoPreview.parentNode.querySelector("iframe");
