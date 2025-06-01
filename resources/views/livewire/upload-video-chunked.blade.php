@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const file = input.files[0];
             if (!file) return;
 
-            if (!['video/mp4', 'video/quicktime'].includes(file.type)) {
+            if (!['video/AVI','video/mp4', 'video/quicktime'].includes(file.type)) {
                 alert('⚠️ Format non supporté.');
                 return;
             }
