@@ -16,6 +16,8 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action as tab;
@@ -115,6 +117,15 @@ class MediaResource extends Resource
                                     '0' => 'NON',
                                 ])
                                 ->label("Est un live?")
+                                ->reactive() // <--- ✅ Nécessaire pour que les autres champs puissent y réagir
+                                ->afterStateUpdated(function (Set $set, $state) {
+                                    if ($state === '0') {
+                                        $set('media_url', null);
+                                    } else {
+                                        $set('media_url', '1'); // Réinitialiser l'URL si besoin
+                                    }
+                                })
+                            // Réinitialiser l'URL si besoin
                                 ->searchable()->columnSpan(6),
                             // Select::make('belongs_to')
                             //     ->label('Appartien à :')
@@ -122,31 +133,29 @@ class MediaResource extends Resource
                             //     ->preload()
                             //     ->columnSpan(6),
                             Select::make('belongs_to')
-                            ->label('Appartient à :')
-                            ->searchable()
-                            ->preload()
-                            ->columnSpan(6)
-                            ->options(function () {
-                                $locale = app()->getLocale();
+                                ->label('Appartient à :')
+                                ->searchable()
+                                ->preload()
+                                ->columnSpan(6)
+                                ->options(function () {
+                                    $locale = app()->getLocale();
 
-                                // Récupère les ID des types "album" ou "série"
-                                $typeIds = \App\Models\Type::get()
-                                    ->filter(function ($type) use ($locale) {
-                                        $name = $type->type_name;
-                                        // dd($name);
-                                        // return $name;
-                                        return in_array($name, ['Album musique', 'Série TV']);
-                                    })
-                                    ->pluck('id')
-                                    ->toArray();
+                                    // Récupère les ID des types "album" ou "série"
+                                    $typeIds = \App\Models\Type::get()
+                                        ->filter(function ($type) use ($locale) {
+                                            $name = $type->type_name;
+                                            // dd($name);
+                                            // return $name;
+                                            return in_array($name, ['Album musique', 'Série TV']);
+                                        })
+                                        ->pluck('id')
+                                        ->toArray();
                                     // dd($typeIds);
-                                // Récupère les médias dont le type correspond
-                                return \App\Models\Media::whereIn('type_id', $typeIds)
-                                    ->pluck("media_title", 'id')// Ou un autre champ représentatif si `title` n'existe pas
-                                    ->toArray();
-                            }),
-
-
+                                    // Récupère les médias dont le type correspond
+                                    return \App\Models\Media::whereIn('type_id', $typeIds)
+                                        ->pluck("media_title", 'id') // Ou un autre champ représentatif si `title` n'existe pas
+                                        ->toArray();
+                                }),
 
                             Select::make('type_id')
                                 ->label('Type :')
@@ -238,23 +247,44 @@ class MediaResource extends Resource
                     Step::make('Étape 4')->schema([
                         Section::make('Vidéo')->schema([
                             \Filament\Forms\Components\View::make('livewire.upload-video-chunked')
+                                ->visible(fn(Get $get) => $get('is_live') != '1') // 🟢 visible seulement si ce n’est pas un live
                                 ->columnSpan(12),
+                            // TextInput::make('media_url')
+                            //     ->id('media_url_filament')
+                            //     ->label('Lien de la vidéo')
+                            //     ->disabled()       // Lecture seule
+                            //     ->dehydrated(true) // Important pour l'enregistrement
+                            //     ->afterStateHydrated(fn($component, $state) => $component->state($state))
+                            //     ->helperText('Ce lien est généré automatiquement après upload. Cliquez sur 🔗 pour l’ouvrir dans un nouvel onglet.')
+                            //     ->columnSpan(12)
+                            //     ->suffixActions([
+                            //         Action::make('ouvrir')
+                            //             ->icon('heroicon-o-arrow-top-right-on-square')
+                            //             ->tooltip('Ouvrir la vidéo dans un nouvel onglet')
+                            //             ->url(fn($state) => $state)
+                            //             ->openUrlInNewTab()
+                            //             ->visible(fn($state) => filled($state)),
+                            //     ]),
+
+                            // 🟢 Champ pour lien du live (quand c’est un live)
                             TextInput::make('media_url')
                                 ->id('media_url_filament')
-                                ->label('Lien de la vidéo')
-                                ->disabled()       // Lecture seule
-                                ->dehydrated(true) // Important pour l'enregistrement
-                                ->afterStateHydrated(fn($component, $state) => $component->state($state))
-                                ->helperText('Ce lien est généré automatiquement après upload. Cliquez sur 🔗 pour l’ouvrir dans un nouvel onglet.')
+                                ->label('Lien du live')
+                                ->placeholder('https://youtube.com/... ou autre')
+                                ->required(fn(Get $get) => $get('is_live') === '1')
+                                ->visible(fn(Get $get) => true)                     // Toujours visible, mais avec logique d'activation
+                                ->disabled(fn(Get $get) => $get('is_live') !== '1') // Désactivé si ce n’est pas un live
+                                ->dehydrated(true)                                  // On veut toujours sauvegarder la valeur (même si désactivé)
                                 ->columnSpan(12)
                                 ->suffixActions([
                                     Action::make('ouvrir')
                                         ->icon('heroicon-o-arrow-top-right-on-square')
-                                        ->tooltip('Ouvrir la vidéo dans un nouvel onglet')
+                                        ->tooltip('Ouvrir le lien')
                                         ->url(fn($state) => $state)
                                         ->openUrlInNewTab()
                                         ->visible(fn($state) => filled($state)),
-                                ]),
+                                ])
+                                ->helperText('Ce lien est requis si le média est un live'),
 
                         ])->columns(12),
                     ]),
